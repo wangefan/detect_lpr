@@ -28,12 +28,16 @@ model_path_str = common_params[MODEL_PATH_KEY]
 if not os.path.exists(model_path_str):
     os.makedirs(model_path_str)
 
+print('Step1: begin to load training data..')
 dataSet = TextDataSet(data_set_params)
 dataSet.loadTrainData()
+print('Step1: load training data OK !!')
 
+print('Step2: begin to build model..')
 model = mo.build_model(models_params)
 loss = tf.reduce_mean(tf.square(model.rect_label_placeholder - model.rect_predict))
 train_step = tf.train.AdamOptimizer().minimize(loss)
+print('Step2: begin to build model OK !!')
 
 with tf.Session() as sess:
 
@@ -55,7 +59,7 @@ with tf.Session() as sess:
             # score_test = loss.eval(feed_dict={model.img_in_placeholder: X2_test, model.rect_label_placeholder: Y2_test})
             # if score_test < best_score:
             #     best_score = score_test
-            if dataSet.epoch_completed() % 2 == 0:
+            if dataSet.epoch_completed() % 10 == 0:
                 saver.save(sess, os.path.join(model_path_str, "model.ckpt"), global_step=dataSet.epoch_completed())
 
             if dataSet.epoch_completed() % 1 == 0:
