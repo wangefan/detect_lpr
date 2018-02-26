@@ -1,0 +1,1 @@
+python tools/train.py -c conf/train.cfg
