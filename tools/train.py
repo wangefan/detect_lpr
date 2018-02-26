@@ -24,7 +24,7 @@ common_params, data_set_params, models_params = process_config(conf_file)
 MODEL_PATH_KEY = 'model_path'
 model_path_str = common_params[MODEL_PATH_KEY]
 
-# 建立model path
+# create model path
 if not os.path.exists(model_path_str):
     os.makedirs(model_path_str)
 
