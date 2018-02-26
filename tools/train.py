@@ -39,7 +39,9 @@ loss = tf.reduce_mean(tf.square(model.rect_label_placeholder - model.rect_predic
 train_step = tf.train.AdamOptimizer().minimize(loss)
 print('Step2: begin to build model OK !!')
 
-with tf.Session() as sess:
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.7
+with tf.Session(config=config) as sess:
 
     # 1. initialize variables
     sess.run(tf.global_variables_initializer())
