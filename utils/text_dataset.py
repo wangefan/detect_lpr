@@ -48,7 +48,7 @@ class TextDataSet():
   """
   def getTestData(self):
     # 讀training data 跟testing data
-    return self.x_test
+    return self.x_test, self.y_test
 
   """ 讀取圖檔
     Args:
@@ -64,10 +64,11 @@ class TextDataSet():
     with open(fname) as data_file:
       data = json.load(data_file)
 
-    left = data["objects"][0]["points"]["exterior"][0][0]
-    top = data["objects"][0]["points"]["exterior"][0][1]
-    right = data["objects"][0]["points"]["exterior"][2][0]
-    bottom = data["objects"][0]["points"]["exterior"][2][1]
+    left = min(data["objects"][0]["points"]["exterior"][0][0], data["objects"][0]["points"]["exterior"][1][0])
+    right = max(data["objects"][0]["points"]["exterior"][0][0], data["objects"][0]["points"]["exterior"][1][0])
+
+    top = min(data["objects"][0]["points"]["exterior"][0][1], data["objects"][0]["points"]["exterior"][1][1])
+    bottom = max(data["objects"][0]["points"]["exterior"][0][1], data["objects"][0]["points"]["exterior"][1][1])
 
     return [left, top, right, bottom]
 
