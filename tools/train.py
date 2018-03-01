@@ -40,7 +40,7 @@ train_step = tf.train.AdamOptimizer().minimize(loss)
 print('Step2: begin to build model OK !!')
 
 config = tf.ConfigProto()
-config.gpu_options.per_process_gpu_memory_fraction = 0.7
+config.gpu_options.per_process_gpu_memory_fraction = 0.95
 with tf.Session(config=config) as sess:
 
     # 1. initialize variables
