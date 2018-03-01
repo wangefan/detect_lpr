@@ -67,6 +67,6 @@ with tf.Session(config=config) as sess:
 
             if dataSet.epoch_completed() % 1 == 0:
                 epm = 60 * dataSet.epoch_completed() / (time.time() - start_time)
-                print('Epoch: %d, Epoch per minute: %f' % (dataSet.epoch_completed(), epm))
+                print('Epoch: %d, loss = %d, Epoch per minute: %f' % (dataSet.epoch_completed(), loss_val, epm))
     print('Finished in %f seconds.' % (time.time() - start_time))
 
