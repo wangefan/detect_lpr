@@ -47,26 +47,35 @@ with tf.Session(config=config) as sess:
     # 1. initialize variables
     sess.run(tf.global_variables_initializer())
 
-    # 2. 建立saver物件，todo:從未train完的model restore後繼續train
+    # 2. 建立saver物件，若有check point，從未train完的model restore後繼續train
     saver = tf.train.Saver()
-    # saver.restore(session, os.path.join(MODEL_PATH, "model"))
+    begin_epoch = 0
+    path = tf.train.latest_checkpoint(model_path_str)
+    if path != None:
+        saver.restore(sess, path)  # search for checkpoint file
+        last_itr_num = path[path.index('-') + 1:]
+        begin_epoch = int(last_itr_num) + 1
 
     start_time = time.time()
-    best_score = 1
-    last_epoch = -1
-    while dataSet.epoch_completed() < dataSet.epoch:
-        (imgs, rect_labels) = dataSet.batch()
-        loss_val, _ = sess.run([loss, train_step], feed_dict={model.img_in_placeholder: imgs, model.rect_label_placeholder: rect_labels})
-        if dataSet.epoch_completed() > last_epoch:
-            last_epoch = dataSet.epoch_completed()
+    print('Step3: begin to train..')
+    for epo_idx in range(begin_epoch, begin_epoch + dataSet.epoch):
+        epoch_complete = False
+        loss_val = 1000.0
+        while True:
+            (epoch_complete, imgs, rect_labels) = dataSet.batch()
+            if epoch_complete == True:
+                break
+            else:
+                loss_val, _ = sess.run([loss, train_step], feed_dict={model.img_in_placeholder: imgs, model.rect_label_placeholder: rect_labels})
+
+        print('Epoch: %d, loss = %f' % (epo_idx, loss_val))
+        if epoch_complete:
             # score_test = loss.eval(feed_dict={model.img_in_placeholder: X2_test, model.rect_label_placeholder: Y2_test})
             # if score_test < best_score:
             #     best_score = score_test
-            if dataSet.epoch_completed() % 10 == 0:
-                saver.save(sess, os.path.join(model_path_str, "model.ckpt"), global_step=dataSet.epoch_completed())
-
-            if dataSet.epoch_completed() % 1 == 0:
-                epm = 60 * dataSet.epoch_completed() / (time.time() - start_time)
-                print('Epoch: %d, loss = %d, Epoch per minute: %f' % (dataSet.epoch_completed(), loss_val, epm))
+            if epo_idx % 10 == 0:
+                saver.save(sess, os.path.join(model_path_str, "model.ckpt"), global_step=epo_idx)
+            dataSet.resetBatch()
+    print('Step3: train ok !!')
     print('Finished in %f seconds.' % (time.time() - start_time))
 

@@ -20,7 +20,6 @@ class TextDataSet():
     self.test_data_path = str(dataset_params['test_path'])
     self.batch_size = int(dataset_params['batch_size'])
     self.epoch =  int(dataset_params['epoch'])
-    self._epochs_completed = 0
     self._index_in_epoch = 0
 
   """ 讀取training data，必須在batch前呼叫才有東西
@@ -107,24 +106,22 @@ class TextDataSet():
     return np.array(xs), np.array(ys)
 
   def batch(self):
-    start = self._index_in_epoch
-    self._index_in_epoch += self.batch_size
-    if self._index_in_epoch > self._num_examples:
-      self._epochs_completed += 1
-      # Shuffle the data
-      perm = np.arange(self._num_examples)
-      np.random.shuffle(perm)
-      self.x_train = self.x_train[perm]
-      self.y_train = self.y_train[perm]
-      # Start next epoch
-      start = 0
-      self._index_in_epoch = self.batch_size
-      assert self.batch_size <= self._num_examples
-    end = self._index_in_epoch
-    return self.x_train[start:end], self.y_train[start:end]
+    if self._index_in_epoch >= self._num_examples:
+      return True, self.x_train[0:0], self.y_train[0:0]
+    else:
+      start = self._index_in_epoch
+      self._index_in_epoch += self.batch_size
+      if self._index_in_epoch > self._num_examples:
+        self._index_in_epoch = self._num_examples
+      return False, self.x_train[start: self._index_in_epoch], self.y_train[start: self._index_in_epoch]
 
-  def epoch_completed(self):
-    return self._epochs_completed
+  def resetBatch(self):
+    # Shuffle the data
+    perm = np.arange(self._num_examples)
+    np.random.shuffle(perm)
+    self.x_train = self.x_train[perm]
+    self.y_train = self.y_train[perm]
+    self._index_in_epoch = 0
 
   def epoch(self):
     return self.epoch
