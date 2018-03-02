@@ -49,7 +49,7 @@ with tf.Session(config=config) as sess:
     sess.run(tf.global_variables_initializer())
 
     # 2. 建立saver物件，若有check point，從未train完的model restore後繼續train
-    saver = tf.train.Saver()
+    saver = tf.train.Saver(max_to_keep=3)
     begin_epoch = 0
     path = tf.train.latest_checkpoint(model_path_str)
     if path != None:
