@@ -58,25 +58,29 @@ with tf.Session(config=config) as sess:
         begin_epoch = int(last_itr_num) + 1
 
     start_time = time.time()
-    loss_val = 1000.0
+
     print('Step3: begin to train..')
     for epo_idx in range(begin_epoch, begin_epoch + dataSet.epoch):
         epoch_complete = False
+        total_loss_val = 0.0
+        num_batch = 0.0
         while True:
             (epoch_complete, imgs, rect_labels) = dataSet.batch()
             if epoch_complete == True:
                 break
             else:
                 loss_val, _ = sess.run([loss, train_step], feed_dict={model.img_in_placeholder: imgs, model.rect_label_placeholder: rect_labels})
-
-        print('Epoch: %d, loss = %f' % (epo_idx, loss_val))
+                total_loss_val += loss_val
+                num_batch += 1.0
+        total_loss_val /= num_batch
+        print('Epoch: %d, loss = %f' % (epo_idx, total_loss_val))
         if epoch_complete:
             # score_test = loss.eval(feed_dict={model.img_in_placeholder: X2_test, model.rect_label_placeholder: Y2_test})
             # if score_test < best_score:
             #     best_score = score_test
             if epo_idx % 500 == 0:
                 saver.save(sess, os.path.join(model_path_str, "model.ckpt"), global_step=epo_idx)
-                print('Epoch: %d, loss = %f, saved!' % (epo_idx, loss_val))
+                print('Epoch: %d, loss = %f, saved!' % (epo_idx, total_loss_val))
             dataSet.resetBatch()
     print('Step3: train ok !!')
     print('Finished in %f seconds.' % (time.time() - start_time))
