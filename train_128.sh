@@ -1,0 +1,1 @@
+python tools/train_128.py -c conf/train_128.cfg
