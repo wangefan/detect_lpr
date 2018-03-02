@@ -113,6 +113,7 @@ class TextDataSet():
       self._index_in_epoch += self.batch_size
       if self._index_in_epoch > self._num_examples:
         self._index_in_epoch = self._num_examples
+        return True, self.x_train[0:0], self.y_train[0:0]
       return False, self.x_train[start: self._index_in_epoch], self.y_train[start: self._index_in_epoch]
 
   def resetBatch(self):
