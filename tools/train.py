@@ -2,6 +2,7 @@ import sys
 import os.path
 from optparse import OptionParser
 import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from utils.text_dataset import TextDataSet
 from utils.process_config import process_config
 import tools.models as mo
@@ -9,7 +10,7 @@ import tensorflow as tf
 import time
 
 # 讓import module可以找到，解決import error
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
 sys.path.append('./')
 
 parser = OptionParser()
