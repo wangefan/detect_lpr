@@ -39,31 +39,13 @@ else:
   print('please sspecify --conf configure filename')
   exit(0)
 
-common_params, data_set_params, _ = process_config(conf_file)
-MODEL_PATH_KEY = 'model_path'
-model_path_str = common_params[MODEL_PATH_KEY]
+_, data_set_params, _ = process_config(conf_file)
 
-# 找到model path
-if not os.path.exists(model_path_str):
-    print('找不到model path')
-    exit(0)
+# 3.
+dataSet = TextDataSet(data_set_params)
+dataSet.loadTestData()
+X_test, y_test = dataSet.getTestData()
 
-with tf.Session() as sess:
-    # 1. build model
-    _, _, models_params = process_config(conf_file)
-    model = mo.build_model(models_params)
-
-    # 2. restore
-    saver = tf.train.Saver()
-    path = tf.train.latest_checkpoint(model_path_str)
-    if path != None:
-        saver.restore(sess, path)  # search for checkpoint file
-
-    # 3.
-    dataSet = TextDataSet(data_set_params)
-    dataSet.loadTestData()
-    X_test = dataSet.getTestData()
-    # X2_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]*X_test.shape[2]))
-    ids = [random.randint(0, X_test.shape[0]-1) for _ in range(9)]
-    predictions = model.rect_predict.eval(session=sess, feed_dict={model.img_in_placeholder: X_test[ids]})
-    plot_images(X_test[ids], (predictions))
+ids = [random.randint(0, X_test.shape[0]-1) for _ in range(9)]
+# predictions = model.rect_predict.eval(session=sess, feed_dict={model.img_in_placeholder: X_test[ids]})
+plot_images(X_test[ids], y_test[ids])
